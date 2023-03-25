@@ -1,32 +1,35 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseFilters } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Query, Req, UseFilters, UsePipes } from '@nestjs/common';
 
 import { CreateCatDto, ListCatsDto, UpdateCatDto } from './dto';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
 import { ForbiddenException } from '../common/forbidden.exception';
 import { HttpExceptionFilter } from '../common/http-exception.filter';
+import { JoiValidationPipe } from '../pipes/joi-validation.pipe';
+import { createCatSchema } from './dto/CreateCat';
 
 @Controller('cats')
 export class CatsController {
   constructor(private catsService: CatsService) { }
 
-  @Get('httpException')
-  error() {
-    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-  }
+  // @Get('httpException')
+  // error() {
+  //   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  // }
 
-  @Get('forbidden')
-  forbidden() {
-    throw new ForbiddenException();
-  }
+  // @Get('forbidden')
+  // forbidden() {
+  //   throw new ForbiddenException();
+  // }
 
-  @Get('httpExceptionFilter')
-  @UseFilters(new HttpExceptionFilter())
-  error2() {
-    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-  }
+  // @Get('httpExceptionFilter')
+  // @UseFilters(new HttpExceptionFilter())
+  // error2() {
+  //   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  // }
 
   @Post()
+  @UsePipes(new JoiValidationPipe(createCatSchema))
   create(@Body() createCatDto: CreateCatDto) {
     this.catsService.create(createCatDto);
   }
@@ -37,14 +40,7 @@ export class CatsController {
   }
 
   @Get(':id')
-  findOne(@Param() params): string {
-    console.log(params.id);
-    return `This action returns a #${params.id} cat`;
-  }
-
-  @Get(':id')
-  findOne2(@Param('id') id): string {
-    console.log(id);
+  findOne(@Param('id', ParseIntPipe) id: number): string {
     return `This action returns a #${id} cat`;
   }
 
