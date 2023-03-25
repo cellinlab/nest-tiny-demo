@@ -8,9 +8,10 @@ import { HttpExceptionFilter } from '../common/http-exception.filter';
 import { JoiValidationPipe } from '../pipes/joi-validation.pipe';
 import { createCatSchema } from './dto/CreateCat';
 import { RolesGuard } from '../guard/roles.guard';
-import { Roles } from 'src/decorators/roles.decotator';
+import { Roles } from 'src/decorators/roles.decorator';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { User } from 'src/decorators/user.decorator';
 
 @Controller('cats')
 @UseGuards(RolesGuard)
@@ -42,7 +43,8 @@ export class CatsController {
   }
 
   @Get()
-  async findAll(): Promise<Cat[]> {
+  async findAll(@User('name') username: string): Promise<Cat[]> {
+    console.log(`username: ${username}`);
     return this.catsService.findAll();
   }
 
